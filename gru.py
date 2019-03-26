@@ -31,6 +31,10 @@ class Tanh:
 class GRU_Cell:
     """docstring for GRU_Cell"""
     def __init__(self, in_dim, hidden_dim):
+        print("0000000000000")
+        print(in_dim)
+        print(hidden_dim)
+
         self.d = in_dim
         self.h = hidden_dim
         h = self.h
@@ -67,8 +71,18 @@ class GRU_Cell:
         #
         # output:
         # 	- h_t: hidden state at current time-step
+        print(x.shape)
+        print(h.shape)
+
+        x = np.reshape(x, (x.shape[0], 1))
+        h = np.reshape(h, (h.shape[0], 1))
+
+        
         self.x=x
         self.h=h
+
+        # self.x=np.reshape(self.x,(self.x.shape[0],1))
+        # self.h = np.reshape(self.h, (self.h.shape[0], 1))
 
 
         self.z1=self.Wzh@self.h
@@ -92,7 +106,7 @@ class GRU_Cell:
         self.z13=self.zt*self.hthat
         self.ht=self.z12+self.z13
 
-        return self.ht
+        return np.ravel(self.ht)
 
 
     def backward(self, delta):
@@ -104,6 +118,11 @@ class GRU_Cell:
         # output:
         # 	- dx: 	Derivative of loss wrt the input x
         # 	- dh: 	Derivative of loss wrt the input hidden h
+
+        delta = np.reshape(delta, (delta.shape[0], 1))
+        self.z12 = np.reshape(self.z12, (self.z12.shape[0], -1))
+        self.z13 = np.reshape(self.z13, (self.z13.shape[0], -1))
+
 
         self.init_deriv()
 
@@ -164,7 +183,7 @@ class GRU_Cell:
         self.dh+=b
 
 
-        return self.dx,self.dh
+        return np.ravel(self.dx),np.ravel(self.dh)
 
 
 
@@ -172,24 +191,24 @@ class GRU_Cell:
 
 
     def init_deriv(self):
-        self.dz13=0
-        self.dz12=0
-        self.dz11=0
-        self.dhthat=0
-        self.dz10=0
-        self.dz9=0
-        self.dz8=0
-        self.dz7=0
-        self.drt=0
-        self.dz6=0
-        self.dz5=0
-        self.dz4=0
-        self.dzt=0
-        self.dz3=0
-        self.dz2=0
-        self.dz1=0
-        self.dh=0
-        self.dx=0
+        self.dz13=np.zeros(self.z13.shape)
+        self.dz12=np.zeros(self.z12.shape)
+        self.dz11=np.zeros(self.z11.shape)
+        self.dhthat=np.zeros(self.hthat.shape)
+        self.dz10=np.zeros(self.z10.shape)
+        self.dz9=np.zeros(self.z9.shape)
+        self.dz8=np.zeros(self.z8.shape)
+        self.dz7=np.zeros(self.z7.shape)
+        self.drt=np.zeros(self.rt.shape)
+        self.dz6=np.zeros(self.z6.shape)
+        self.dz5=np.zeros(self.z5.shape)
+        self.dz4=np.zeros(self.z4.shape)
+        self.dzt=np.zeros(self.zt.shape)
+        self.dz3=np.zeros(self.z3.shape)
+        self.dz2=np.zeros(self.z2.shape)
+        self.dz1=np.zeros(self.z1.shape)
+        self.dh=np.zeros(self.h.shape)
+        self.dx=np.zeros(self.x.shape)
 
         h=self.hh
         d=self.d
@@ -205,9 +224,9 @@ class GRU_Cell:
         if operator==None:
             return dz
         elif operator=='*':
-            return dz*np.transpose(x), dz*np.transpose(y)
+            return dz*x, dz*y
         elif operator=='@':
-            return dz@y,x@dz#correct?
+            return dz@np.transpose(y),np.transpose(x)@dz#correct?
         elif operator=='+':
             return dz,dz
         elif operator=='-':
