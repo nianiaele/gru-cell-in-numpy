@@ -41,13 +41,21 @@ class GRU_Cell:
         d = self.d
         self.hh=h
 
-        self.Wzh = np.random.randn(h,h)
-        self.Wrh = np.random.randn(h,h)
-        self.Wh  = np.random.randn(h,h)
+        # self.Wzh = np.random.randn(h,h)
+        # self.Wrh = np.random.randn(h,h)
+        # self.Wh  = np.random.randn(h,h)
+        #
+        # self.Wzx = np.random.randn(h,d)
+        # self.Wrx = np.random.randn(h,d)
+        # self.Wx  = np.random.randn(h,d)
 
-        self.Wzx = np.random.randn(h,d)
-        self.Wrx = np.random.randn(h,d)
-        self.Wx  = np.random.randn(h,d)
+        self.Wzh = np.ones((h,h))
+        self.Wrh = np.ones((h,h))
+        self.Wh  = np.ones((h,h))
+
+        self.Wzx = np.ones((h,d))
+        self.Wrx = np.ones((h,d))
+        self.Wx  = np.ones((h,d))
 
 
 
@@ -71,8 +79,8 @@ class GRU_Cell:
         #
         # output:
         # 	- h_t: hidden state at current time-step
-        print(x.shape)
-        print(h.shape)
+        print(x)
+        print(h)
 
         x = np.reshape(x, (x.shape[0], 1))
         h = np.reshape(h, (h.shape[0], 1))
@@ -80,9 +88,6 @@ class GRU_Cell:
         
         self.x=x
         self.h=h
-
-        # self.x=np.reshape(self.x,(self.x.shape[0],1))
-        # self.h = np.reshape(self.h, (self.h.shape[0], 1))
 
 
         self.z1=self.Wzh@self.h
@@ -119,13 +124,11 @@ class GRU_Cell:
         # 	- dx: 	Derivative of loss wrt the input x
         # 	- dh: 	Derivative of loss wrt the input hidden h
 
-        print("delta shape is ",delta.shape)
+        print("delta shape is ",delta)
 
         delta = delta.T
         print("after transpose delta shape is ", delta.shape)
 
-        self.z12 = np.reshape(self.z12, (self.z12.shape[0], -1))
-        self.z13 = np.reshape(self.z13, (self.z13.shape[0], -1))
 
 
         self.init_deriv()
@@ -142,7 +145,7 @@ class GRU_Cell:
         self.dz11+=a
         self.dh+=b
         a,b=self.deriv(self.dz11,'-',1,self.zt)
-        self.dz11+=b
+        self.dzt+=b
 
         #second wave
         a = self.deriv(self.dhthat,'act',0,0,self.h_act)
@@ -163,7 +166,7 @@ class GRU_Cell:
         #third wave
         a=self.deriv(self.drt,'act',0,0,self.r_act)
         self.dz6+=a
-        a,b=self.deriv(self.z6,'+',self.z4,self.z5)
+        a,b=self.deriv(self.dz6,'+',self.z4,self.z5)
         self.dz4+=a
         self.dz5+=b
         a,b=self.deriv(self.dz5,'@',self.Wrx,self.x)
@@ -225,7 +228,7 @@ class GRU_Cell:
         if operator==None:
             return dz
         elif operator=='*':
-            return dz*x, dz*y
+            return dz*y, dz*x
         elif operator=='@':
             return dz@np.transpose(y),np.transpose(x)@dz
         elif operator=='+':
