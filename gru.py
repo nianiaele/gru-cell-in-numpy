@@ -41,21 +41,14 @@ class GRU_Cell:
         d = self.d
         self.hh=h
 
-        # self.Wzh = np.random.randn(h,h)
-        # self.Wrh = np.random.randn(h,h)
-        # self.Wh  = np.random.randn(h,h)
-        #
-        # self.Wzx = np.random.randn(h,d)
-        # self.Wrx = np.random.randn(h,d)
-        # self.Wx  = np.random.randn(h,d)
+        self.Wzh = np.random.randn(h,h)
+        self.Wrh = np.random.randn(h,h)
+        self.Wh  = np.random.randn(h,h)
 
-        self.Wzh = np.ones((h,h))
-        self.Wrh = np.ones((h,h))
-        self.Wh  = np.ones((h,h))
+        self.Wzx = np.random.randn(h,d)
+        self.Wrx = np.random.randn(h,d)
+        self.Wx  = np.random.randn(h,d)
 
-        self.Wzx = np.ones((h,d))
-        self.Wrx = np.ones((h,d))
-        self.Wx  = np.ones((h,d))
 
 
 
