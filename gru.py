@@ -119,7 +119,11 @@ class GRU_Cell:
         # 	- dx: 	Derivative of loss wrt the input x
         # 	- dh: 	Derivative of loss wrt the input hidden h
 
-        delta = np.reshape(delta, (delta.shape[0], 1))
+        print("delta shape is ",delta.shape)
+
+        delta = delta.T
+        print("after transpose delta shape is ", delta.shape)
+
         self.z12 = np.reshape(self.z12, (self.z12.shape[0], -1))
         self.z13 = np.reshape(self.z13, (self.z13.shape[0], -1))
 
@@ -183,10 +187,7 @@ class GRU_Cell:
         self.dh+=b
 
 
-        return np.ravel(self.dx),np.ravel(self.dh)
-
-
-
+        return self.dx.T,self.dh.T
 
 
 
@@ -226,7 +227,7 @@ class GRU_Cell:
         elif operator=='*':
             return dz*x, dz*y
         elif operator=='@':
-            return dz@np.transpose(y),np.transpose(x)@dz#correct?
+            return dz@np.transpose(y),np.transpose(x)@dz
         elif operator=='+':
             return dz,dz
         elif operator=='-':
